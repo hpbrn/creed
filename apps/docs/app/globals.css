@@ -1,0 +1,25 @@
+@import "../../../packages/creed-app/app/globals.css";
+
+@source "../**/*.{js,jsx,ts,tsx,mdx}";
+
+/* Docs keeps the picker purple as its accent, not the product UI blue. */
+.docs-app {
+  --creed-accent: #9333ea;
+  --creed-accent-hover: color-mix(in srgb, #9333ea 82%, black);
+}
+
+.docs-prose {
+  min-height: 0;
+}
+
+.docs-prose > * + * {
+  margin-top: 1rem;
+}
+
+.docs-prose > h3 {
+  margin-top: 2rem;
+}
+
+.docs-prose strong {
+  font-weight: 600;
+}

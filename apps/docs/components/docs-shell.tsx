@@ -1,0 +1,186 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { ChevronDown } from "lucide-react";
+import { BrandedCredit } from "@creed/ui/branded-credit";
+import { DocsLogo } from "./docs-logo";
+import { useOpenSections } from "./use-open-sections";
+
+export type DocsEntry = {
+  id: string;
+  label: string;
+  group: string;
+  title: string;
+  content: ReactNode;
+};
+
+function clearHash() {
+    if (!window.location.hash) return;
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
+
+export function DocsShell({ entries }: { entries: DocsEntry[] }) {
+  const groups = useMemo(
+    () =>
+      Array.from(new Set(entries.map((entry) => entry.group))).map((group) => ({
+        group,
+        entries: entries.filter((entry) => entry.group === group),
+      })),
+    [entries],
+  );
+  const [active, setActive] = useState(entries[0]?.id ?? "");
+  const locked = useRef(false);
+  const unlockTimer = useRef<number | null>(null);
+  const { isOpen, toggle } = useOpenSections(groups[0]?.group ?? null);
+
+  useEffect(() => {
+    const elements = entries
+      .map(({ id }) => document.getElementById(id))
+      .filter((element): element is HTMLElement => Boolean(element));
+    const observer = new IntersectionObserver(
+      (observed) => {
+        if (locked.current) return;
+        const top = observed
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (top?.target.id) setActive(top.target.id);
+      },
+      { rootMargin: "-96px 0px -68% 0px" },
+    );
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, [entries]);
+
+  const goTo = useCallback((id: string) => {
+    const target = document.getElementById(id);
+    if (!target) return;
+    setActive(id);
+    locked.current = true;
+    if (unlockTimer.current) window.clearTimeout(unlockTimer.current);
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    clearHash();
+    unlockTimer.current = window.setTimeout(() => {
+      locked.current = false;
+    }, 1000);
+  }, []);
+
+  useEffect(() => {
+    const hashId = window.location.hash.replace(/^#/, "");
+    if (hashId && entries.some((entry) => entry.id === hashId)) {
+      const frame = window.requestAnimationFrame(() => goTo(hashId));
+      return () => {
+        window.cancelAnimationFrame(frame);
+        if (unlockTimer.current) window.clearTimeout(unlockTimer.current);
+      };
+    }
+    clearHash();
+  }, [entries, goTo]);
+
+  const navigation = (mobile = false) => (
+    <nav className="space-y-1" aria-label="Documentation">
+      {groups.map(({ group, entries: groupEntries }) => {
+        const open = isOpen(group);
+        const activeGroup = groupEntries.some(({ id }) => id === active);
+        return (
+          <div key={group}>
+            <button
+              type="button"
+              onClick={() => toggle(group)}
+              aria-expanded={open}
+              className={`flex w-full items-center justify-between gap-2 py-1.5 text-left text-[15px] font-medium transition-opacity duration-200 ${
+                !mobile && activeGroup
+                  ? "text-[var(--creed-accent)]"
+                  : "text-[var(--creed-text-primary)] hover:opacity-70"
+              }`}
+            >
+              {group}
+              <ChevronDown className={`h-[18px] w-[18px] transition-transform duration-200 ${open ? "" : "-rotate-90"}`} />
+            </button>
+            <AnimatePresence initial={false}>
+              {open ? (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                  className="overflow-hidden"
+                >
+                  <div className="mb-3 mt-1 space-y-2.5">
+                    {groupEntries.map((entry) => (
+                      <button
+                        key={entry.id}
+                        type="button"
+                        aria-current={!mobile && active === entry.id ? "true" : undefined}
+                        onClick={() => goTo(entry.id)}
+                        className={`block w-full text-left text-[14px] leading-6 transition-opacity duration-200 ${
+                          !mobile && active === entry.id
+                            ? "font-medium text-[var(--creed-accent)]"
+                            : "text-[var(--creed-text-primary)] hover:opacity-70"
+                        }`}
+                      >
+                        {entry.label}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </div>
+        );
+      })}
+    </nav>
+  );
+
+  return (
+    <div className="min-h-screen bg-[var(--creed-background)] text-[var(--creed-text-primary)]">
+      <div className="mx-auto max-w-[1280px] px-5 pb-24 pt-10 md:px-8 md:pt-14">
+        <div className="mb-10 lg:hidden">
+          <div className="mb-4 text-[17px] font-semibold">On this page</div>
+          {navigation(true)}
+        </div>
+
+        <div className="grid gap-16 lg:grid-cols-[220px_minmax(0,900px)] lg:gap-20">
+          <aside className="hidden lg:block">
+            <div className="sticky top-10 pb-12">
+              <DocsLogo className="mb-5 h-[18px] w-auto" />
+              {navigation()}
+            </div>
+          </aside>
+
+          <main className="min-w-0">
+            {entries.map((entry, index) => (
+              <section
+                key={entry.id}
+                id={entry.id}
+                className={`scroll-mt-10 py-10 ${index === entries.length - 1 ? "" : "border-b border-[var(--creed-border)]"}`}
+              >
+                <div
+                  className="ProseMirror docs-prose"
+                  style={{
+                    "--section-accent": "var(--creed-accent)",
+                    "--section-accent-tint":
+                      "color-mix(in srgb, var(--creed-accent) 11%, transparent)",
+                    "--section-accent-border":
+                      "color-mix(in srgb, var(--creed-accent) 12%, transparent)",
+                    "--section-accent-bar":
+                      "color-mix(in srgb, var(--creed-accent) 82%, transparent)",
+                  } as CSSProperties}
+                >
+                  <h2>{entry.title}</h2>
+                  {entry.content}
+                </div>
+              </section>
+            ))}
+          </main>
+        </div>
+        <div className="mx-auto max-w-[640px] border-t border-[var(--creed-border)] pt-10">
+          <BrandedCredit
+            accent="var(--creed-accent)"
+            style={{ color: "var(--creed-text-tertiary)" }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
