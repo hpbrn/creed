@@ -250,7 +250,7 @@ export function FileSectionHeading({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-3">
           <span
-            className="inline-block h-9 w-[3px] rounded-full"
+            className="inline-block h-9 w-1 shrink-0 rounded-[1.25px]"
             style={{ backgroundColor: accent }}
           />
           <div className="flex min-w-0 flex-wrap items-center gap-2.5">

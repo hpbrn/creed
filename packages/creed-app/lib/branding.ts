@@ -10,6 +10,6 @@ export const LEGAL_OPERATOR_NAME =
 export const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}`;
 
 export const GITHUB_URL = "https://github.com/hpbrn/creed";
-export const DISCORD_URL = "https://discord.gg/4AxX8AbwH8";
+export const DISCORD_URL = "https://join.hpbrn.com";
 export const TWITTER_URL = "https://x.com/connorhpbrn";
 export const INSTAGRAM_URL = "https://www.instagram.com/connorhpbrn";

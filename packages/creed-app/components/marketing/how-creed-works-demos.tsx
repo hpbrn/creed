@@ -25,10 +25,7 @@ import {
   getActivityFilterTone,
   getActivityStatusStyles,
 } from "@/components/creed/activity-ui";
-import {
-  CreedDiffView,
-  DiffBadge,
-} from "@/components/creed/inline-proposal-diff";
+import { DiffBadge } from "@/components/creed/inline-proposal-diff";
 import { computeCreedDiff } from "@/lib/creed-diff";
 import {
   QualityRing,
@@ -281,8 +278,6 @@ const ROUTINES_BASE = [
   "Ship to production Monday through Thursday only.",
 ];
 const ROUTINES_ADD = "Batch code review into a single block after standup.";
-const ROUTINES_BASE_PLAIN = ROUTINES_BASE.join("\n");
-const ROUTINES_APPLIED_PLAIN = [...ROUTINES_BASE, ROUTINES_ADD].join("\n");
 const ROUTINES_BASE_HTML = bulletList(ROUTINES_BASE);
 const ROUTINES_APPLIED_HTML = bulletList([...ROUTINES_BASE, ROUTINES_ADD]);
 
@@ -294,23 +289,19 @@ const UPDATE_STEPS = [1400, 3000, 2600] as const;
 // stats with Reject / Accept on one line. The line diff drops down below
 // when `expanded`, with a smooth height animation.
 function MiniProposalDiff({
-  base,
-  proposed,
   agentName,
   expanded,
   onAccept,
   onReject,
 }: {
-  base: string;
-  proposed: string;
   agentName: string;
   expanded: boolean;
   onAccept: () => void;
   onReject: () => void;
 }) {
   const diff = useMemo(
-    () => computeCreedDiff(base, proposed),
-    [base, proposed],
+    () => computeCreedDiff("", ROUTINES_ADD),
+    [],
   );
   return (
     <div className="rounded-lg border border-[var(--creed-border)] bg-[var(--creed-surface)] shadow-[0_8px_24px_rgba(28,28,26,0.04)]">
@@ -367,12 +358,7 @@ function MiniProposalDiff({
           >
             <div className="border-t border-[var(--creed-border)]" />
             <div className="creed-diff-block py-3">
-              <span className="sm:hidden">
-                <span className="creed-diff-add">{ROUTINES_ADD}</span>
-              </span>
-              <div className="hidden sm:block">
-                <CreedDiffView diff={diff} />
-              </div>
+              <span className="creed-diff-add">{ROUTINES_ADD}</span>
             </div>
           </motion.div>
         ) : null}
@@ -430,8 +416,6 @@ export function UpdateDemo() {
             >
               <div className="min-h-0 overflow-hidden">
                 <MiniProposalDiff
-                  base={ROUTINES_BASE_PLAIN}
-                  proposed={ROUTINES_APPLIED_PLAIN}
                   agentName="Claude"
                   expanded={expanded}
                   onAccept={() => setStep(2)}

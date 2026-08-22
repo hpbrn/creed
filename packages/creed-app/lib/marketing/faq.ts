@@ -1,5 +1,5 @@
 // Canonical FAQ content for the public site. Shared by the visible FAQ on
-// /home (components/marketing/below-hero-sections.tsx) and the FAQPage
+// /home (components/marketing/landing/faq.tsx) and the FAQPage
 // JSON-LD that ships on the same page (lib/seo/structured-data.ts). Keeping
 // one source means the structured data can never drift from the rendered
 // answers, which is exactly what search and AI engines check for.

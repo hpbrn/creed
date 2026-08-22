@@ -215,11 +215,11 @@ export function MarketingHeader({
           }}
           transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
           className={cn(
-            "pointer-events-none absolute inset-x-0 top-0 drop-shadow-[0_10px_18px_rgba(0,0,0,0.16)]",
+            "pointer-events-none absolute inset-x-0 top-0 transition-opacity duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
             stickyChromeActive ? "opacity-100" : "opacity-0",
           )}
         >
-          <div className="absolute inset-0 rounded-xl border border-[var(--creed-border)] bg-[var(--creed-surface)]" />
+          <div className="absolute inset-0 rounded-xl bg-[var(--creed-surface)] shadow-[0_8px_24px_-12px_rgba(28,28,26,0.18)] ring-1 ring-black/[0.06] dark:shadow-none dark:ring-white/[0.08]" />
         </motion.div>
         <header
           className={cn(

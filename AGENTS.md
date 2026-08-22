@@ -191,10 +191,8 @@ These are non-negotiable. Don't cross them without asking.
 - Default Next/Image quality (75) is fine for backgrounds. Don't use
   `quality={100}` without confirming `next.config.ts:images.qualities`
   allowlists it AND restarting the dev server.
-- Marketing page MediaSlots show a clean placeholder card when an
-  image file is missing. See the comment block at the top of
-  `MediaSlot` in `components/marketing/below-hero-sections.tsx` for
-  the canonical naming convention.
+- Marketing scenery shows a labelled placeholder when an image file
+  is missing. See `components/marketing/scenery-image.tsx`.
 
 ---
 

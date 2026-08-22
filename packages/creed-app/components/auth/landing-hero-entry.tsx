@@ -1,7 +1,7 @@
 "use client";
 
-import { LandingHero } from "@/components/auth/landing-hero";
+import { LandingPage } from "@/components/marketing/landing/landing-page";
 
 export function LandingHeroEntry({ configured }: { configured: boolean }) {
-  return <LandingHero configured={configured} />;
+  return <LandingPage configured={configured} />;
 }

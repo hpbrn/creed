@@ -106,6 +106,8 @@ The CLI card remains visible but disabled in both editions. Its action is `View 
 
 ## Public surface
 
+The `/home` landing is composed in `packages/creed-app/components/marketing/landing/landing-page.tsx`. The hero is a client island; below-the-fold sections are siblings in one `main`. Inner marketing pages stay chrome plus a page view.
+
 The public marketing site is shared, but calls to action resolve through the edition adapter. Open uses `View on GitHub` and never exposes signup. Cloud can retain hosted account flows in development. Documentation is an independent static application at `docs.creed.md`; Open and Cloud link to it and do not own a `/docs` route.
 
 ## Open installation

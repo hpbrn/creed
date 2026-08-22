@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { SceneryFade, SceneryImage } from "@/components/marketing/scenery-image";
-import { BelowHeroSections } from "@/components/marketing/below-hero-sections";
 import { CreedAppDemo } from "@/components/marketing/creed-app-demo";
 import { MarketingHeader } from "@/components/marketing/site-chrome";
 import { useLandingAuthState } from "@/components/marketing/use-landing-auth-state";
@@ -77,7 +76,7 @@ export function LandingHero({ configured }: { configured: boolean }) {
             <div className="flex flex-1 items-start justify-center pt-[13vh] text-center md:pt-[12vh]">
               <div className="w-full max-w-3xl">
                 <h1 className="t-hero justify-center text-white">
-                  {["Your context file", "for all agents"].map((line) => (
+                  {["Your personal context", "all in one place"].map((line) => (
                     <span key={line} className="block whitespace-nowrap">
                       {line}
                     </span>
@@ -85,7 +84,7 @@ export function LandingHero({ configured }: { configured: boolean }) {
                 </h1>
 
                 <p className="mx-auto mt-5 max-w-xl text-[15px] font-semibold text-white/90 md:mt-6 md:whitespace-nowrap md:text-[18px]">
-                  Tell every agent who you are, once.
+                  Tell every agent who you are.
                 </p>
 
                 <div className="mt-7 flex justify-center">
@@ -123,7 +122,6 @@ export function LandingHero({ configured }: { configured: boolean }) {
         </div>
       </div>
 
-      <BelowHeroSections configured={configured} />
     </>
   );
 }

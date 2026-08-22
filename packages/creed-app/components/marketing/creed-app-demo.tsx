@@ -145,7 +145,7 @@ function DemoCloudSaveStatus({ syncing }: { syncing: boolean }) {
         <AnimatePresence initial={false}>
           <motion.span
             key={syncing ? "syncing" : "synced"}
-            className="col-start-1 row-start-1"
+            className="col-start-1 row-start-1 whitespace-nowrap"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -821,12 +821,12 @@ export function CreedAppDemo() {
                 )}
               >
                 <FileStickyHeaderRow compact>
-                  <div>
+                  <div className="shrink-0">
                     <div className="whitespace-nowrap text-[18px] font-medium tracking-[-0.02em] text-[var(--creed-text-primary)] md:text-[20px]">{profile.name}.md</div>
                     <DemoCloudSaveStatus syncing={saving} />
                   </div>
 
-                  <div className="flex items-center gap-2 self-start">
+                  <div className="flex min-w-0 shrink items-center gap-2 self-start">
                     <OverallQualityPopover
                       report={quality}
                       loading={qualityLoading}
