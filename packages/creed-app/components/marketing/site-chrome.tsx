@@ -546,7 +546,7 @@ function HeaderDropdown({
         aria-expanded={open}
         aria-haspopup="menu"
         className={cn(
-          "inline-flex h-9 items-center gap-1 rounded-md px-3.5 text-[14px] font-medium transition-colors duration-200",
+          "group inline-flex h-9 items-center gap-1 rounded-md px-3.5 text-[14px] font-medium transition-colors duration-200",
           scrolled
             ? "text-[var(--creed-text-primary)] hover:text-[var(--creed-text-secondary)]"
             : "text-white hover:text-white/55",
@@ -555,8 +555,13 @@ function HeaderDropdown({
         {label}
         <ChevronDown
           className={cn(
-            "h-3.5 w-3.5 transition-transform duration-200",
+            "h-3.5 w-3.5 transition-[color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
             open && "rotate-180",
+            scrolled
+              ? open
+                ? "text-[var(--creed-text-primary)]"
+                : "text-[var(--creed-text-tertiary)] group-hover:text-[var(--creed-text-primary)]"
+              : "text-white/70 group-hover:text-white",
           )}
         />
       </button>

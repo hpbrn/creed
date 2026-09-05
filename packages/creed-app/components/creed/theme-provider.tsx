@@ -13,6 +13,11 @@ import {
 type Theme = "light" | "dark";
 type Origin = { x: number; y: number };
 
+type ViewTransition = {
+  ready: Promise<void>;
+  finished: Promise<void>;
+};
+
 const ThemeContext = createContext<{
   theme: Theme;
   toggleTheme: (origin?: Origin) => void;
@@ -20,11 +25,21 @@ const ThemeContext = createContext<{
 
 const KEY = "creed:theme";
 const SWITCHING_CLASS = "creed-theme-switching";
+const REVEAL_STYLE_ID = "creed-theme-reveal";
+const TRANSITION_MS = 520;
+const REVEAL_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+const CIRCLE_MASK = `url("data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="white"/></svg>',
+)}")`;
 
 function apply(theme: Theme) {
   const root = document.documentElement;
   root.classList.toggle("dark", theme === "dark");
   root.style.colorScheme = theme;
+}
+
+function themeFromDocument(): Theme {
+  return document.documentElement.classList.contains("dark") ? "dark" : "light";
 }
 
 function systemTheme(): Theme {
@@ -74,6 +89,70 @@ function suspendOffscreenFileSections() {
   };
 }
 
+function persistTheme(theme: Theme) {
+  try {
+    localStorage.setItem(KEY, theme);
+  } catch {
+    // Storage can be unavailable in restricted browser contexts.
+  }
+}
+
+function originForToggle(explicit: Origin | undefined, pointer: Origin | null) {
+  if (explicit) return explicit;
+  if (pointer) return pointer;
+  const control = document.querySelector<HTMLElement>(
+    'button[aria-label="Dark mode"], button[aria-label="Light mode"]',
+  );
+  const target = control?.querySelector("svg") ?? control;
+  if (target) {
+    const rect = target.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  }
+  return { x: innerWidth / 2, y: innerHeight / 2 };
+}
+
+function installRevealStyle(origin: Origin) {
+  const radius = Math.hypot(
+    Math.max(origin.x, innerWidth - origin.x),
+    Math.max(origin.y, innerHeight - origin.y),
+  );
+  const size = Math.ceil(radius * 2.1);
+  let style = document.getElementById(REVEAL_STYLE_ID);
+  if (!style) {
+    style = document.createElement("style");
+    style.id = REVEAL_STYLE_ID;
+    document.head.append(style);
+  }
+  // Clip-path on ::view-transition-* is ignored in some engines, which
+  // leaves the default fade (a pulse from the centre). A mask animation
+  // with coordinates written into the sheet is what production theme
+  // wipes use, and it starts with the pseudo-elements.
+  style.textContent = `
+::view-transition-new(root) {
+  mask: ${CIRCLE_MASK} 0 0 / 0 no-repeat;
+  -webkit-mask: ${CIRCLE_MASK} 0 0 / 0 no-repeat;
+  animation: creed-theme-reveal ${TRANSITION_MS}ms ${REVEAL_EASE} both;
+}
+@keyframes creed-theme-reveal {
+  from {
+    mask-size: 0px;
+    mask-position: ${origin.x}px ${origin.y}px;
+    -webkit-mask-size: 0px;
+    -webkit-mask-position: ${origin.x}px ${origin.y}px;
+  }
+  to {
+    mask-size: ${size}px;
+    mask-position: ${origin.x - size / 2}px ${origin.y - size / 2}px;
+    -webkit-mask-size: ${size}px;
+    -webkit-mask-position: ${origin.x - size / 2}px ${origin.y - size / 2}px;
+  }
+}
+`;
+  return () => {
+    style?.remove();
+  };
+}
+
 export function ThemeProvider({
   children,
   followSystem = false,
@@ -81,8 +160,11 @@ export function ThemeProvider({
   children: ReactNode;
   followSystem?: boolean;
 }) {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>(() =>
+    typeof document === "undefined" ? "light" : themeFromDocument(),
+  );
   const pointer = useRef<Origin | null>(null);
+  const revealing = useRef(false);
 
   useEffect(() => {
     const stored = localStorage.getItem(KEY) as Theme | null;
@@ -101,119 +183,88 @@ export function ThemeProvider({
     };
     preference?.addEventListener("change", onScheme);
 
-    const onMove = (e: PointerEvent) => {
-      pointer.current = { x: e.clientX, y: e.clientY };
+    const onPointer = (event: PointerEvent) => {
+      pointer.current = { x: event.clientX, y: event.clientY };
     };
-    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerdown", onPointer, { passive: true });
+    window.addEventListener("pointermove", onPointer, { passive: true });
     return () => {
       preference?.removeEventListener("change", onScheme);
-      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerdown", onPointer);
+      window.removeEventListener("pointermove", onPointer);
     };
   }, [followSystem]);
 
-  const toggleTheme = useCallback(
-    (origin?: Origin) => {
-      const next: Theme = theme === "dark" ? "light" : "dark";
-      const persist = () => {
-        try {
-          localStorage.setItem(KEY, next);
-        } catch {}
-      };
+  const toggleTheme = useCallback((origin?: Origin) => {
+    if (revealing.current) return;
 
-      const start = (
-        document as Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void> } }
-      ).startViewTransition?.bind(document);
-      const reduceMotion =
-        typeof matchMedia !== "undefined" &&
-        matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const isFileRoute = window.location.pathname === "/file";
-      const transitionDuration = 520;
-
-      if (reduceMotion) {
-        const removeTransitionGuard = guardThemeSwitchTransitions();
-        apply(next);
-        requestAnimationFrame(() => {
-          requestAnimationFrame(removeTransitionGuard);
-        });
-        setTheme(next);
-        persist();
-        return;
+    const next: Theme = themeFromDocument() === "dark" ? "light" : "dark";
+    const start = (
+      document as Document & {
+        startViewTransition?: (cb: () => void) => ViewTransition;
       }
+    ).startViewTransition?.bind(document);
+    const reduceMotion =
+      typeof matchMedia !== "undefined" &&
+      matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isFileRoute = window.location.pathname === "/file";
+    const p = originForToggle(origin, pointer.current);
 
-      const p = origin ?? pointer.current ?? {
-        x: innerWidth / 2,
-        y: innerHeight / 2,
-      };
-
-      if (!start) {
-        const removeTransitionGuard = guardThemeSwitchTransitions();
-        apply(next);
-        requestAnimationFrame(() => {
-          requestAnimationFrame(removeTransitionGuard);
-        });
-        setTheme(next);
-        persist();
-        return;
-      }
-
-      // Install the performance guard before the browser captures the old
-      // snapshot so both snapshots have the same computed animation styles.
-      // The reveal itself remains byte-for-byte equivalent to the original.
+    const commit = () => {
       const removeTransitionGuard = guardThemeSwitchTransitions();
-      const restoreOffscreenSections = isFileRoute
-        ? suspendOffscreenFileSections()
-        : () => {};
+      apply(next);
+      persistTheme(next);
+      setTheme(next);
+      revealing.current = false;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(removeTransitionGuard);
+      });
+    };
 
-      // Only the cheap `.dark` class flip runs inside the transition callback,
-      // so the captured "new" snapshot is correct without paying for a full
-      // synchronous React re-render on the critical path. The React state
-      // update is deferred outside the transition - the live DOM it touches is
-      // hidden behind the snapshot until the animation finishes, so it can
-      // never block or stutter the reveal.
-      const transition = start(() => {
+    if (reduceMotion || !start) {
+      commit();
+      return;
+    }
+
+    revealing.current = true;
+    const removeRevealStyle = installRevealStyle(p);
+    const removeTransitionGuard = guardThemeSwitchTransitions();
+    const restoreOffscreenSections = isFileRoute
+      ? suspendOffscreenFileSections()
+      : () => {};
+
+    const settle = () => {
+      apply(next);
+      persistTheme(next);
+      setTheme(next);
+      restoreOffscreenSections();
+      removeTransitionGuard();
+      removeRevealStyle();
+      revealing.current = false;
+    };
+
+    let transition: ViewTransition;
+    try {
+      transition = start(() => {
         apply(next);
       });
-      setTheme(next);
-      persist();
+    } catch {
+      settle();
+      return;
+    }
 
-      void transition.ready.then(
-        () => {
-          const r = Math.hypot(
-            Math.max(p.x, innerWidth - p.x),
-            Math.max(p.y, innerHeight - p.y),
-          );
-          document.documentElement.animate(
-            {
-              clipPath: [
-                `circle(0 at ${p.x}px ${p.y}px)`,
-                `circle(${r}px at ${p.x}px ${p.y}px)`,
-              ],
-            },
-            {
-              duration: transitionDuration,
-              easing: "cubic-bezier(0.22,1,0.36,1)",
-              pseudoElement: "::view-transition-new(root)",
-            },
-          );
-          requestAnimationFrame(() => {
-            restoreOffscreenSections();
-            removeTransitionGuard();
-          });
-        },
-        () => {
-          restoreOffscreenSections();
-          removeTransitionGuard();
-        },
-      );
-    },
-    [theme]
-  );
+    void transition.ready.catch(() => {});
+    void transition.finished.then(settle, settle);
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.key !== "m" && e.key !== "M") || e.metaKey || e.ctrlKey || e.altKey) return;
+      if ((e.key !== "m" && e.key !== "M") || e.metaKey || e.ctrlKey || e.altKey)
+        return;
+      if (e.repeat || e.isComposing || e.defaultPrevented) return;
       const t = e.target as HTMLElement | null;
-      if (!t || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable) return;
+      if (!t || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)
+        return;
       e.preventDefault();
       toggleTheme();
     };
@@ -222,7 +273,9 @@ export function ThemeProvider({
   }, [toggleTheme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
   );
 }
 

@@ -5,6 +5,9 @@ import { useAppNavigate, useAppPath } from "@/components/creed/app-navigation";
 import { Check, ChevronDown, Plus } from "lucide-react";
 import { toast } from "sonner";
 import {
+  DROPDOWN_CHEVRON_CLASS,
+  DROPDOWN_CONTENT_CLASS,
+  DROPDOWN_ITEM_CLASS,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -168,7 +171,7 @@ export function CreedSwitcher() {
               )}
             </span>
             <ChevronDown
-              className="h-4 w-4 shrink-0 text-[var(--creed-text-primary)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[state=open]/switcher:rotate-180"
+              className={cn(DROPDOWN_CHEVRON_CLASS, "group-data-[state=open]/switcher:rotate-180")}
               strokeWidth={2}
             />
           </button>
@@ -177,7 +180,7 @@ export function CreedSwitcher() {
         </div>
         <DropdownMenuContent
           align="start"
-          className="min-w-[250px] rounded-lg border-[var(--creed-border)] bg-[var(--creed-surface)] p-1"
+          className={cn(DROPDOWN_CONTENT_CLASS, "min-w-[250px]")}
         >
         {creeds.map((creed) => {
           const label = creed.name;
@@ -189,7 +192,7 @@ export function CreedSwitcher() {
               onSelect={() => {
                 void switchTo(creed);
               }}
-              className="flex items-center justify-between gap-2.5 rounded-sm py-1.5 pl-1.5 pr-2.5 text-[13px]"
+              className={cn(DROPDOWN_ITEM_CLASS, "justify-between")}
             >
               <span className="flex min-w-0 items-center gap-2 text-[var(--creed-text-primary)]">
                 <ProfileAvatar
@@ -214,7 +217,7 @@ export function CreedSwitcher() {
           <DropdownMenuItem
             disabled={switching}
             onSelect={() => setNewCreedOpen(true)}
-            className="flex items-center justify-between gap-2.5 rounded-sm py-1.5 pl-1.5 pr-2.5 text-[13px]"
+            className={cn(DROPDOWN_ITEM_CLASS, "justify-between")}
           >
             <span className="flex min-w-0 items-center gap-2 text-[var(--creed-text-primary)]">
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[8px] border border-dashed border-[var(--creed-border-strong)] bg-[var(--creed-surface-raised)]">

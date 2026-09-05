@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from "@creed/ui/dialog";
 import {
+  DROPDOWN_CONTENT_CLASS,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuSeparator,
@@ -325,7 +326,7 @@ export function ConnectionCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="border-[var(--creed-border)] bg-[var(--creed-surface)]"
+              className={DROPDOWN_CONTENT_CLASS}
             >
               {AGENT_OPEN_URLS[connection.id] ? (
                 <AnimatedMenuIconItem

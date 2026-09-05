@@ -150,10 +150,6 @@ export function ConnectionsScreen({ active = true }: { active?: boolean }) {
           <h2 className="text-[16px] font-medium text-[var(--creed-text-primary)]">
             Setup
           </h2>
-          <p className="mt-2 text-[14px] leading-7 text-[var(--creed-text-secondary)]">
-            Paste the server URL into any MCP agent, then authorize Creed in the
-            browser.
-          </p>
         </div>
 
         <div className="mt-5 flex h-auto flex-col rounded-xl border border-[var(--creed-border)] bg-[var(--creed-surface)] p-4 md:p-5">
@@ -260,15 +256,10 @@ export function ConnectionsScreen({ active = true }: { active?: boolean }) {
           </AnimatePresence>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="text-[16px] font-medium text-[var(--creed-text-primary)]">
-              Agents
-            </h2>
-            <p className="mt-2 text-[14px] leading-7 text-[var(--creed-text-secondary)]">
-              Every agent Creed supports and its MCP connection status.
-            </p>
-          </div>
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-[16px] font-medium text-[var(--creed-text-primary)]">
+            Agents
+          </h2>
           <Dropdown
             trigger={
               AGENT_CATEGORY_FILTER_ITEMS.find(

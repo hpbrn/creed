@@ -16,6 +16,8 @@ import {
 } from "@/components/creed/inline-proposal-diff";
 import { computeCreedDiff, type CreedDiff } from "@/lib/creed-diff";
 import {
+  DROPDOWN_CONTENT_CLASS,
+  DROPDOWN_ITEM_CLASS,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuPortal,
@@ -192,7 +194,7 @@ export const ReviewPill = memo(function ReviewPill({
                 // Tertiary by default, flips to primary text colour when the
                 // trigger row is hovered or the dropdown is open - matches
                 // the chevron behaviour on the profile and colour dropdowns.
-                className="-rotate-90 text-[var(--creed-text-tertiary)] transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/trigger:text-[var(--creed-text-primary)] group-data-[state=open]/trigger:rotate-0 group-data-[state=open]/trigger:text-[var(--creed-text-primary)]"
+                className="-rotate-90 text-[var(--creed-text-tertiary)] transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/trigger:text-[var(--creed-text-primary)] group-data-[state=open]/trigger:rotate-0 group-data-[state=open]/trigger:text-[var(--creed-text-primary)] in-aria-expanded:rotate-0 in-aria-expanded:text-[var(--creed-text-primary)]"
               />
             </span>
           </button>
@@ -213,7 +215,10 @@ export const ReviewPill = memo(function ReviewPill({
           // Mobile uses a viewport-aware cap so the inline-expanded diff
           // never touches the screen edge. Desktop restores the original
           // 280px width that the side-popping submenu was tuned against.
-          className="relative w-[min(100vw-48px,300px)] border-[var(--creed-border)] bg-[var(--creed-surface)] p-1 md:w-[280px]"
+          className={cn(
+            DROPDOWN_CONTENT_CLASS,
+            "relative w-[min(100vw-48px,300px)] md:w-[280px]",
+          )}
           onCloseAutoFocus={(event) => {
             // Don't return focus to the trigger button on close - the
             // browser's smooth `scrollIntoView` from a "Jump to section"
@@ -251,7 +256,7 @@ export const ReviewPill = memo(function ReviewPill({
               item.proposal.draft.kind === "new-section";
             return (
               <DropdownMenuSub key={item.proposal.id}>
-                <DropdownMenuSubTrigger className="group/sub rounded-[var(--radius-md)] px-2 py-1.5 text-sm hover:bg-[var(--creed-surface-raised)] [&>svg:last-of-type]:hidden">
+                <DropdownMenuSubTrigger className={cn(DROPDOWN_ITEM_CLASS, "group/sub hover:bg-[var(--creed-surface-raised)] [&>svg:last-of-type]:hidden")}>
                   <div className="flex min-w-0 flex-1 items-center gap-2">
                     <ProposalAuthor
                       authorType={item.proposal.authorType}
@@ -439,15 +444,18 @@ function ReviewPillItem({
           event.stopPropagation();
           onOpenChange(!open);
         }}
-        className="flex w-full min-w-0 items-center gap-2 rounded-[var(--radius-md)] px-2 py-1.5 text-left text-sm outline-none focus-visible:ring-2 focus-visible:ring-[var(--creed-accent)]/45"
+        className={cn(
+          DROPDOWN_ITEM_CLASS,
+          "group w-full min-w-0 justify-start text-left outline-none focus-visible:ring-2 focus-visible:ring-[var(--creed-accent)]/45",
+        )}
         aria-expanded={open}
       >
         <ChevronDown
           className={cn(
-            "h-3.5 w-3.5 shrink-0 transition-[color,transform] duration-200",
+            "h-3.5 w-3.5 shrink-0 text-[var(--creed-text-tertiary)] transition-[color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:text-[var(--creed-text-primary)]",
             open
               ? "rotate-0 text-[var(--creed-text-primary)]"
-              : "-rotate-90 text-[var(--creed-text-tertiary)]",
+              : "-rotate-90",
           )}
         />
         <ProposalAuthor

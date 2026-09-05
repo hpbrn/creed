@@ -1356,17 +1356,24 @@
   text-decoration-color: rgba(248, 113, 113, 0.5);
 }
 
-/* View Transition API hooks for the circular theme reveal (see
-   components/creed/theme-provider.tsx). The default cross-fade is killed so
-   only the new layer animates; the JS animation drives the clip-path. */
+/* Default view transitions cross-fade with mix-blend-mode: plus-lighter.
+   Two full-opacity snapshots then add together and read as a pulse.
+   isolation: auto + mix-blend-mode: normal is the MDN theme-wipe setup. */
+::view-transition-image-pair(root) {
+  isolation: auto;
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
+  display: block;
 }
+
 ::view-transition-old(root) {
   z-index: 0;
 }
+
 ::view-transition-new(root) {
   z-index: 1;
 }

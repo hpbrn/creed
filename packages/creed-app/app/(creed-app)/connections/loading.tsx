@@ -32,24 +32,8 @@ function Card({
   );
 }
 
-// Section heading (16px) + one line of 14px/leading-7 description.
-function SectionHeading({
-  titleWidth,
-  descriptionWidth,
-}: {
-  titleWidth: string;
-  descriptionWidth: string;
-}) {
-  return (
-    <div>
-      <SkeletonText preset="h2" width={titleWidth} />
-      <SkeletonText
-        preset="t14Loose"
-        width={descriptionWidth}
-        className="mt-2"
-      />
-    </div>
-  );
+function SectionHeading({ titleWidth }: { titleWidth: string }) {
+  return <SkeletonText preset="h2" width={titleWidth} />;
 }
 
 // Glyph + name + status dot/label, shared by the Setup and Agents cards.
@@ -75,7 +59,7 @@ export function ConnectionsLoading() {
         <SkeletonText preset="h1" width="w-[140px]" />
 
         <div className="mt-8">
-          <SectionHeading titleWidth="w-[37px]" descriptionWidth="w-[26rem]" />
+          <SectionHeading titleWidth="w-[37px]" />
         </div>
 
         <Card className="mt-5 flex h-auto flex-col rounded-xl border p-4 md:p-5">
@@ -95,8 +79,8 @@ export function ConnectionsLoading() {
           </div>
         </Card>
 
-        <div className="mt-10 flex flex-wrap items-end justify-between gap-3">
-          <SectionHeading titleWidth="w-[46px]" descriptionWidth="w-[19rem]" />
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-3">
+          <SectionHeading titleWidth="w-[46px]" />
           <SkeletonBar className="h-8 w-[74px] rounded-md" />
         </div>
 
@@ -125,8 +109,8 @@ export function ConnectionsLoading() {
         </div>
 
         <div className="mt-12">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <SectionHeading titleWidth="w-[43px]" descriptionWidth="w-[21rem]" />
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <SectionHeading titleWidth="w-[43px]" />
             <div className="flex min-w-0 max-w-full items-center gap-3 md:gap-4">
               <SkeletonBar className="h-8 w-[92px] shrink-0 rounded-md" />
               <SkeletonBar className="h-8 w-[74px] shrink-0 rounded-md" />

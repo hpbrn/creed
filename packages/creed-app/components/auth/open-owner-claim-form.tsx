@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ClipboardEvent, type FormEvent, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
+import { LoaderCircle } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { cn } from "@creed/ui/utils";
 
@@ -104,6 +105,7 @@ function DigitCell({
 
 export function OpenOwnerClaimForm({ nextPath = "/file" }: { nextPath?: string }) {
   const router = useRouter();
+  const reduceMotion = useReducedMotion();
   const [digits, setDigits] = useState(() => Array.from({ length: OWNER_CODE_LENGTH }, () => ""));
   const [delays, setDelays] = useState(() => Array.from({ length: OWNER_CODE_LENGTH }, () => 0));
   const [error, setError] = useState<string | null>(null);
@@ -252,25 +254,33 @@ export function OpenOwnerClaimForm({ nextPath = "/file" }: { nextPath?: string }
     }
   }
 
+  const title = submitting ? "Entering" : "Enter code";
+
   return (
     <form onSubmit={handleSubmit} aria-busy={submitting || undefined} className="w-auto">
-      <h1 className="text-center text-[1.5rem] font-medium tracking-[-0.03em] text-[var(--creed-text-primary)]">
-        Enter code
-      </h1>
-      <p
+      <h1
         aria-live="polite"
-        role={error && !submitting ? "alert" : undefined}
-        className={cn(
-          "mt-2 min-h-[1.25rem] text-center text-[13px]",
-          error && !submitting
-            ? "text-[#ef4444]"
-            : "text-[var(--creed-text-secondary)]",
-        )}
+        className="relative flex h-9 items-center justify-center text-center text-[1.5rem] font-medium tracking-[-0.03em] text-[var(--creed-text-primary)]"
       >
-        {submitting ? "Opening your Creed." : error ? error : "\u00a0"}
-      </p>
+        {/* Absolute layers keep the inputs still while the title crossfades. */}
+        <AnimatePresence initial={false}>
+          <motion.span
+            key={title}
+            className="absolute inset-x-0 inline-flex items-center justify-center gap-2"
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 6, filter: "blur(5px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, filter: "blur(5px)" }}
+            transition={{ duration: 0.28, ease: DIGIT_EASE }}
+          >
+            {title}
+            {submitting ? (
+              <LoaderCircle className="h-5 w-5 shrink-0 animate-spin" strokeWidth={2} />
+            ) : null}
+          </motion.span>
+        </AnimatePresence>
+      </h1>
       {/* Fieldsets default to min-inline-size: min-content and would overflow the page. */}
-      <fieldset className="mt-6 min-w-0 min-is-0">
+      <fieldset className="mt-8 min-w-0 min-is-0">
         <legend className="sr-only">Owner code</legend>
         <div className={cn("flex w-auto items-center justify-center gap-1.5", submitting && "opacity-55")}>
           {OWNER_CODE_GROUPS.map((groupSize, groupIndex) => {
@@ -314,6 +324,22 @@ export function OpenOwnerClaimForm({ nextPath = "/file" }: { nextPath?: string }
           })}
         </div>
       </fieldset>
+      <AnimatePresence initial={false}>
+        {error && !submitting ? (
+          <motion.p
+            key={error}
+            role="alert"
+            aria-live="polite"
+            className="mt-3 text-center text-[13px] text-[#ef4444]"
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.2, ease: DIGIT_EASE }}
+          >
+            {error}
+          </motion.p>
+        ) : null}
+      </AnimatePresence>
     </form>
   );
 }

@@ -74,6 +74,10 @@ import {
   DialogTitle,
 } from "@creed/ui/dialog";
 import {
+  DROPDOWN_CHEVRON_CLASS,
+  DROPDOWN_CONTENT_CLASS,
+  DROPDOWN_ITEM_CLASS,
+  DROPDOWN_SUB_CHEVRON_CLASS,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuPortal,
@@ -2819,12 +2823,12 @@ export function FileScreen({ active = true }: { active?: boolean }) {
                             )}
                             disabled={!githubConfigured}
                           >
-                            <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[state=open]/vcsplit:rotate-180" />
+                            <ChevronDown className={cn(DROPDOWN_CHEVRON_CLASS, "group-data-[state=open]/vcsplit:rotate-180")} />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                           align="end"
-                          className="border-[var(--creed-border)] bg-[var(--creed-surface)]"
+                          className={DROPDOWN_CONTENT_CLASS}
                         >
                           <AnimatedMenuIconItem
                             icon={CloudUploadIcon}
@@ -2982,7 +2986,7 @@ export function FileScreen({ active = true }: { active?: boolean }) {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className="border-[var(--creed-border)] bg-[var(--creed-surface)]"
+                        className={DROPDOWN_CONTENT_CLASS}
                       >
                         <AnimatedMenuIconItem
                           icon={FolderUpIcon}
@@ -4247,7 +4251,7 @@ function SectionCard({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="border-[var(--creed-border)] bg-[var(--creed-surface)]"
+                  className={DROPDOWN_CONTENT_CLASS}
                 >
                   <AnimatedMenuIconItem
                     icon={SquarePenIcon}
@@ -4268,7 +4272,10 @@ function SectionCard({
                         stampIconRef.current?.startAnimation()
                       }
                       onMouseLeave={() => stampIconRef.current?.stopAnimation()}
-                      className="group/colour rounded-[var(--radius-md)] gap-1.5 px-2.5 py-2 text-sm [&>svg:last-of-type]:hidden"
+                      className={cn(
+                        DROPDOWN_ITEM_CLASS,
+                        "group/colour [&>svg:last-of-type]:hidden",
+                      )}
                     >
                       <StampIcon
                         ref={stampIconRef}
@@ -4278,7 +4285,7 @@ function SectionCard({
                       <span className="flex-1 text-left">Colour</span>
                       <ChevronLeft
                         className={cn(
-                          "h-3.5 w-3.5 shrink-0 text-[var(--creed-text-tertiary)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                          DROPDOWN_SUB_CHEVRON_CLASS,
                           "group-hover/colour:rotate-180 group-data-[state=open]/colour:rotate-180",
                         )}
                       />

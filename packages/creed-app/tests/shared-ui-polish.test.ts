@@ -15,9 +15,11 @@ test("shared overlays, consent spacing, and connection actions stay responsive",
   const toaster = source("../../creed-ui/toaster.tsx");
 
   assert.match(picker, /py-0 pl-1\.5 pr-3/);
-  assert.match(picker, /py-1\.5 pl-1\.5 pr-2/);
+  assert.match(picker, /DROPDOWN_ITEM_CLASS/);
   assert.match(toaster, /className="!z-40/);
   assert.match(connections, /\{setupOpen \? "Hide instructions" : "Show instructions"\}/);
+  assert.doesNotMatch(connections, /Paste the server URL/);
+  assert.doesNotMatch(connections, /Every agent Creed supports/);
   assert.doesNotMatch(connections, /sm:hidden[^\n]*\{setupOpen/);
   assert.doesNotMatch(connectionCard, /min-w-\[116px\]/);
   assert.doesNotMatch(connections, /min-w-\[116px\]/);
@@ -77,8 +79,11 @@ test("Open owner unlock is only a masked code and auto-submits", () => {
   const enter = source("../../creed-open/app/enter/page.tsx");
 
   assert.match(claim, /Enter code/);
-  assert.match(claim, /Opening your Creed\./);
+  assert.match(claim, /Entering/);
+  assert.doesNotMatch(claim, /Opening your Creed/);
   assert.match(claim, /nextPath = "\/file"/);
+  assert.match(claim, /LoaderCircle/);
+  assert.match(claim, /fieldset className="mt-8/);
   assert.match(claim, /text-\[1\.5rem\]/);
   assert.match(claim, /text-\[22px\]/);
   assert.match(claim, /h-10 w-10/);
@@ -144,6 +149,27 @@ test("sidebar collapse keeps page nav aligned and fades Sections into a line", (
   assert.match(shell, /accountTriggerRef.current\?\.matches\(":hover"\)/);
   assert.match(shell, /accountHovered && "bg-\[var\(--creed-surface-raised\)\]"/);
   assert.match(shell, /sidebarNavRowClass\(collapsed\)/);
+  assert.match(shell, /function ThemeSidebarButton/);
+  assert.match(
+    shell,
+    /relative mx-auto block h-8 w-8 bg-transparent text-\[14px\] font-medium text-\[var\(--creed-text-primary\)\]/,
+  );
+  assert.match(shell, /lg:mx-0 lg:w-full/);
+  assert.match(
+    shell,
+    /flex h-full w-full min-w-0 items-center justify-center overflow-hidden rounded-sm/,
+  );
+  assert.match(shell, /sidebarNavRowClass\(collapsed\)/);
+  assert.match(shell, /sidebarIconSlotClass\(collapsed\)/);
+  assert.doesNotMatch(shell, /variant="ghost"/);
+  assert.doesNotMatch(shell, /lg:pl-\[7px\]/);
+  const themeButton = shell.slice(shell.indexOf("function ThemeSidebarButton"));
+  assert.match(themeButton, /x: event\.clientX, y: event\.clientY/);
+  assert.doesNotMatch(
+    themeButton,
+    /rect\.left \+ rect\.width \/ 2/,
+  );
+  assert.doesNotMatch(themeButton, /onFocus=\{/);
 });
 
 test("mobile account submenus ignore Radix closes after a tap toggle", () => {
@@ -155,14 +181,14 @@ test("mobile account submenus ignore Radix closes after a tap toggle", () => {
   assert.deepEqual(calls, [true, false]);
 });
 
-test("account menu rows match the switcher inset and 32px sidebar rows", () => {
+test("account menu rows match the switcher inset and 32px dropdown rows", () => {
   const accountMenu = source("../lib/account-menu.ts");
   const shell = source("../components/creed/shell.tsx");
   const status = source("../components/creed/status-menu.tsx");
   const feedback = source("../../creed-cloud/components/creed/feedback-menu.tsx");
   assert.match(accountMenu, /export const ACCOUNT_MENU_ITEM_CLASS/);
-  assert.match(accountMenu, /h-8 gap-2 rounded-sm px-1\.5 py-0/);
-  assert.match(shell, /rounded-lg border-\[var\(--creed-border\)\] bg-\[var\(--creed-surface\)\] p-1/);
+  assert.match(accountMenu, /h-8 gap-2 rounded-sm px-2 py-0/);
+  assert.match(shell, /DROPDOWN_CONTENT_CLASS/);
   assert.match(shell, /className=\{ACCOUNT_MENU_ITEM_CLASS\}/);
   assert.match(status, /ACCOUNT_MENU_ITEM_CLASS/);
   assert.match(feedback, /ACCOUNT_MENU_ITEM_CLASS/);
@@ -207,6 +233,56 @@ test("file header outline pills share one mobile focus ring reset", () => {
     (demo.match(/FILE_HEADER_OUTLINE_MOBILE_FOCUS_CLASS/g) ?? []).length,
     6,
   );
+});
+
+test("dropdown menus share the switcher inset, 32px rows, and flipping chevrons", () => {
+  const menu = source("../../creed-ui/dropdown-menu.tsx");
+  const switcher = source("../components/creed/creed-switcher.tsx");
+  const select = source("../../creed-ui/select-menu.tsx");
+  const health = source("../components/creed/mcp-health-dashboard.tsx");
+  const settings = source("../components/creed/settings-screen.tsx");
+  const picker = source("../components/creed/authorize-space-picker.tsx");
+
+  assert.match(menu, /export const DROPDOWN_CONTENT_CLASS/);
+  assert.match(menu, /bg-\[var\(--creed-surface\)\] p-1\.5/);
+  assert.match(menu, /flex h-8 cursor-default items-center gap-2 rounded-sm px-2 py-0 text-\[13px\]/);
+  assert.match(menu, /export const DROPDOWN_CHEVRON_CLASS/);
+  assert.match(menu, /transition-\[color,transform,rotate\] duration-200/);
+  assert.match(menu, /in-aria-expanded:rotate-180 in-aria-expanded:text-\[var\(--creed-text-primary\)\]/);
+  assert.match(switcher, /DROPDOWN_CONTENT_CLASS/);
+  assert.match(switcher, /DROPDOWN_ITEM_CLASS/);
+  assert.match(switcher, /DROPDOWN_CHEVRON_CLASS/);
+  assert.match(select, /DROPDOWN_CHEVRON_CLASS/);
+  assert.match(health, /DROPDOWN_CHEVRON_CLASS/);
+  assert.doesNotMatch(health, /How your connected agents/);
+  assert.match(settings, /DROPDOWN_CHEVRON_CLASS/);
+  assert.match(picker, /DROPDOWN_CHEVRON_CLASS/);
+});
+
+test("theme reveal uses a cursor-locked CSS mask and kills the default plus-lighter fade", () => {
+  const provider = source("../components/creed/theme-provider.tsx");
+  const css = source("../app/globals.css");
+  const toggle = provider.slice(provider.indexOf("const toggleTheme"));
+  const startAt = toggle.indexOf("transition = start(() => {");
+  assert.match(provider, /function themeFromDocument/);
+  assert.match(provider, /function originForToggle/);
+  assert.match(provider, /function installRevealStyle/);
+  assert.match(provider, /mask-position: \$\{origin\.x\}px \$\{origin\.y\}px/);
+  assert.match(provider, /pointer\.current/);
+  assert.match(toggle, /installRevealStyle\(p\)/);
+  assert.match(toggle, /start\(\(\) => \{\s*apply\(next\);/);
+  assert.match(toggle, /transition\.finished\.then\(settle, settle\)/);
+  assert.doesNotMatch(
+    toggle.slice(startAt, toggle.indexOf("transition.finished")),
+    /setTheme\(next\)/,
+  );
+  assert.doesNotMatch(provider, /flushSync/);
+  assert.doesNotMatch(provider, /window\.setTimeout/);
+  assert.doesNotMatch(provider, /pseudoElement: "::view-transition-new\(root\)"/);
+  assert.match(css, /::view-transition-image-pair\(root\)/);
+  assert.match(css, /isolation: auto/);
+  assert.match(css, /mix-blend-mode: normal/);
+  assert.match(css, /\[data-theme-snapshot-hidden\] > \*/);
 });
 
 test("mobile review-pill actions sit 2px closer to the card edges", () => {

@@ -40,8 +40,8 @@ import { UserIcon } from "@creed/ui/user";
 import { useAnimatedIconControls } from "@/components/creed/animated-icon-controls";
 import { useTheme } from "@/components/creed/theme-provider";
 import { Avatar, AvatarFallback } from "@creed/ui/avatar";
-import { Button } from "@creed/ui/button";
 import {
+  DROPDOWN_CONTENT_CLASS,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -888,7 +888,7 @@ export function CreedShell({
                 <DropdownMenuContent
                   align="start"
                   className={cn(
-                    "rounded-lg border-[var(--creed-border)] bg-[var(--creed-surface)] p-1",
+                    DROPDOWN_CONTENT_CLASS,
                     // Collapsed rail: the trigger is a 32px square, so the
                     // trigger-width menu would be unusably narrow.
                     collapsed ? "w-48" : "w-(--radix-dropdown-menu-trigger-width)"
@@ -1047,48 +1047,55 @@ function ThemeSidebarButton({ collapsed }: { collapsed: boolean }) {
   const label = theme === "dark" ? "Light mode" : "Dark mode";
 
   return (
-    <Button
+    <button
       type="button"
-      variant="ghost"
       aria-label={label}
-      className={cn(
-        "h-auto w-full min-w-0 justify-center overflow-hidden rounded-sm border-0 bg-transparent px-1 py-1 text-[var(--creed-text-primary)] transition-colors hover:bg-[var(--creed-surface-raised)] dark:hover:bg-[var(--creed-surface-raised)]",
-        `lg:transition-[padding,gap] ${SIDEBAR_COLLAPSE_MOTION}`,
-        collapsed
-          ? "lg:justify-start lg:gap-0 lg:px-1"
-          : "lg:justify-start lg:gap-2.5 lg:pl-[7px] lg:pr-2.5 lg:py-1.5",
-      )}
+      className="relative mx-auto block h-8 w-8 bg-transparent text-[14px] font-medium text-[var(--creed-text-primary)] lg:mx-0 lg:w-full"
       onClick={(event) => {
-        const rect = event.currentTarget.getBoundingClientRect();
-        toggleTheme({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+        // Pointer clicks carry the cursor. Keyboard activation (detail 0)
+        // leaves origin unset so ThemeProvider uses the last pointer, not
+        // the centre of this now-full-width desktop row.
+        toggleTheme(
+          event.detail > 0
+            ? { x: event.clientX, y: event.clientY }
+            : undefined,
+        );
       }}
       onMouseEnter={() => iconRef.current?.startAnimation()}
       onMouseLeave={() => iconRef.current?.stopAnimation()}
-      onFocus={() => iconRef.current?.startAnimation()}
-      onBlur={() => iconRef.current?.stopAnimation()}
     >
-      <span className={sidebarIconSlotClass(collapsed, "md")}>
-        <ContrastIcon
-          ref={iconRef}
-          size={14}
-          className="inline-flex h-6 w-6 shrink-0 items-center justify-center leading-none"
-        />
-      </span>
-      <span
-        className={cn("hidden text-sm font-medium lg:inline", sidebarLabelRevealClass(collapsed))}
-        aria-hidden={collapsed || undefined}
-      >
-        {label}
-      </span>
       <span
         className={cn(
-          "hidden lg:ml-auto lg:inline-flex",
-          sidebarLabelRevealClass(collapsed),
+          "flex h-full w-full min-w-0 items-center justify-center overflow-hidden rounded-sm hover:bg-[var(--creed-surface-raised)] hover:text-[var(--creed-text-primary)]",
+          SIDEBAR_PRESS_CLASS,
+          sidebarNavRowClass(collapsed),
         )}
-        aria-hidden={collapsed || undefined}
       >
-        <ShortcutKey>M</ShortcutKey>
+        <span className={sidebarIconSlotClass(collapsed)}>
+          <ContrastIcon
+            ref={iconRef}
+            size={14}
+            className="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center leading-none"
+          />
+        </span>
+        <span
+          className={cn(
+            "hidden flex-1 text-left lg:inline",
+            sidebarLabelRevealClass(collapsed),
+          )}
+          aria-hidden={collapsed || undefined}
+        >
+          {label}
+        </span>
+        <ShortcutKey
+          className={cn(
+            "hidden shrink-0 lg:inline-flex",
+            sidebarLabelRevealClass(collapsed),
+          )}
+        >
+          M
+        </ShortcutKey>
       </span>
-    </Button>
+    </button>
   );
 }

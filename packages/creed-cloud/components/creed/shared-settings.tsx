@@ -20,6 +20,9 @@ import {
   DialogTitle,
 } from "@creed/ui/dialog";
 import {
+  DROPDOWN_CHEVRON_CLASS,
+  DROPDOWN_CONTENT_CLASS,
+  DROPDOWN_ITEM_CLASS,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -1307,8 +1310,8 @@ export function SharedSettings() {
             </span>
             <ChevronDown
               className={cn(
-                "h-4 w-4 shrink-0 text-[var(--creed-text-tertiary)] transition-all duration-200 group-hover:text-[var(--creed-text-primary)]",
-                agentPermsOpen && "rotate-180",
+                DROPDOWN_CHEVRON_CLASS,
+                agentPermsOpen && "rotate-180 text-[var(--creed-text-primary)]",
               )}
             />
           </button>
@@ -1446,18 +1449,18 @@ export function SharedSettings() {
                 className="inline-flex h-8 items-center gap-2 rounded-md border border-[var(--creed-border)] bg-[var(--creed-surface)] px-3 text-sm text-[var(--creed-text-primary)] transition-colors duration-150 hover:bg-[var(--creed-surface-raised)]"
               >
                 {aiSettings.aiMode === "credits" ? "Credits" : "BYOK"}
-                <ChevronDown className="h-3.5 w-3.5 text-[var(--creed-text-secondary)]" />
+                <ChevronDown className={DROPDOWN_CHEVRON_CLASS} />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="min-w-32 space-y-1 border-[var(--creed-border)] bg-[var(--creed-surface)] p-1.5"
+              className={cn(DROPDOWN_CONTENT_CLASS, "min-w-32")}
             >
               {(["credits", "byok"] as AiMode[]).map((mode) => (
                 <DropdownMenuItem
                   key={mode}
                   onSelect={() => void changeAiMode(mode)}
-                  className="flex items-center justify-between gap-5 rounded-lg px-3 py-2 text-sm"
+                  className={cn(DROPDOWN_ITEM_CLASS, "justify-between")}
                 >
                   <span>{mode === "credits" ? "Credits" : "BYOK"}</span>
                   {aiSettings.aiMode === mode ? (

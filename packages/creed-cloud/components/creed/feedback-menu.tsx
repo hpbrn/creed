@@ -6,6 +6,7 @@ import { CONTACT_MAILTO } from "@/lib/branding";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import {
+  DROPDOWN_SUB_CHEVRON_CLASS,
   DropdownMenuPortal,
   DropdownMenuSub,
   DropdownMenuSubContent,
@@ -150,9 +151,9 @@ export function FeedbackMenuItem({
         <span className="flex-1 text-left">Feedback</span>
         <ChevronLeft
           className={cn(
-            "h-3.5 w-3.5 shrink-0 text-[var(--creed-text-tertiary)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
-            "group-hover/feedback:rotate-180",
-            open && "rotate-180 text-[var(--creed-text-primary)]"
+            DROPDOWN_SUB_CHEVRON_CLASS,
+            "group-hover/feedback:rotate-180 group-hover/feedback:text-[var(--creed-text-primary)]",
+            open && "rotate-180 text-[var(--creed-text-primary)]",
           )}
         />
       </DropdownMenuSubTrigger>

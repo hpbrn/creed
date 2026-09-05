@@ -4,6 +4,7 @@ import { ArrowUpRight, ChevronLeft } from "lucide-react";
 import { motion, useSpring } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
+  DROPDOWN_SUB_CHEVRON_CLASS,
   DropdownMenuPortal,
   DropdownMenuSub,
   DropdownMenuSubContent,
@@ -357,9 +358,9 @@ export function StatusMenuItem({
         <span className="flex-1 text-left">Status</span>
         <ChevronLeft
           className={cn(
-            "h-3.5 w-3.5 shrink-0 text-[var(--creed-text-tertiary)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
-            "group-hover/status:rotate-180",
-            open && "rotate-180 text-[var(--creed-text-primary)]"
+            DROPDOWN_SUB_CHEVRON_CLASS,
+            "group-hover/status:rotate-180 group-hover/status:text-[var(--creed-text-primary)]",
+            open && "rotate-180 text-[var(--creed-text-primary)]",
           )}
         />
       </DropdownMenuSubTrigger>

@@ -15,6 +15,9 @@ import { DownloadIcon } from "@creed/ui/download";
 import { useRouter } from "next/navigation";
 import { useAppNavigate } from "@/components/creed/app-navigation";
 import {
+  DROPDOWN_CHEVRON_CLASS,
+  DROPDOWN_CONTENT_CLASS,
+  DROPDOWN_ITEM_CLASS,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -1018,10 +1021,9 @@ function PersonalSettingsScreen() {
                     </span>
                     <ChevronDown
                       className={cn(
-                        // Match the other dropdown chevrons: tertiary by default,
-                        // primary (white in dark) on hover.
-                        "h-4 w-4 shrink-0 text-[var(--creed-text-tertiary)] transition-all duration-200 group-hover:text-[var(--creed-text-primary)]",
-                        permsOpen && "rotate-180",
+                        DROPDOWN_CHEVRON_CLASS,
+                        permsOpen &&
+                          "rotate-180 text-[var(--creed-text-primary)]",
                       )}
                     />
                   </button>
@@ -1128,18 +1130,18 @@ function PersonalSettingsScreen() {
                     className="inline-flex h-8 items-center gap-2 rounded-md border border-[var(--creed-border)] bg-[var(--creed-surface)] px-3 text-sm text-[var(--creed-text-primary)] transition-colors duration-150 hover:bg-[var(--creed-surface-raised)]"
                   >
                     {aiSettings.aiMode === "credits" ? "Credits" : "BYOK"}
-                    <ChevronDown className="h-3.5 w-3.5 text-[var(--creed-text-secondary)]" />
+                    <ChevronDown className={DROPDOWN_CHEVRON_CLASS} />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="min-w-32 space-y-1 border-[var(--creed-border)] bg-[var(--creed-surface)] p-1.5"
+                  className={cn(DROPDOWN_CONTENT_CLASS, "min-w-32")}
                 >
                   {(["credits", "byok"] as AiMode[]).map((mode) => (
                     <DropdownMenuItem
                       key={mode}
                       onSelect={() => void handleModeChange(mode)}
-                      className="flex items-center justify-between gap-5 rounded-lg px-3 py-2 text-sm"
+                      className={cn(DROPDOWN_ITEM_CLASS, "justify-between")}
                     >
                       <span>{mode === "credits" ? "Credits" : "BYOK"}</span>
                       {aiSettings.aiMode === mode ? (
@@ -1930,18 +1932,18 @@ export function UsageCard({
               className="inline-flex h-8 items-center gap-2 rounded-md border border-[var(--creed-border)] bg-[var(--creed-surface)] px-3 text-sm text-[var(--creed-text-primary)] transition-colors duration-150 hover:bg-[var(--creed-surface-raised)]"
             >
               {range}
-              <ChevronDown className="h-3.5 w-3.5 text-[var(--creed-text-secondary)]" />
+              <ChevronDown className={DROPDOWN_CHEVRON_CLASS} />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="min-w-24 space-y-1 border-[var(--creed-border)] bg-[var(--creed-surface)] p-1.5"
+            className={cn(DROPDOWN_CONTENT_CLASS, "min-w-24")}
           >
             {(["7d", "30d", "90d"] as AiUsageRange[]).map((item) => (
               <DropdownMenuItem
                 key={item}
                 onSelect={() => onRangeChange(item)}
-                className="flex items-center justify-between gap-5 rounded-lg px-3 py-2 text-sm"
+                className={cn(DROPDOWN_ITEM_CLASS, "justify-between")}
               >
                 <span>{item}</span>
                 {range === item ? (

@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import {
+  DROPDOWN_CHEVRON_CLASS,
+  DROPDOWN_CONTENT_CLASS,
+  DROPDOWN_ITEM_CLASS,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -64,13 +67,14 @@ export function AuthorizeSpacePicker({
                 {selected?.label ?? "Select a Creed"}
               </span>
             </span>
-            <ChevronDown className="h-3.5 w-3.5 shrink-0 text-[var(--creed-text-tertiary)]" strokeWidth={2} />
+            <ChevronDown className={DROPDOWN_CHEVRON_CLASS} strokeWidth={2} />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="start"
           className={cn(
-            "w-[var(--radix-dropdown-menu-trigger-width)] max-w-[min(24rem,90vw)] border-[var(--creed-border)] bg-[var(--creed-surface)]",
+            DROPDOWN_CONTENT_CLASS,
+            "w-[var(--radix-dropdown-menu-trigger-width)] max-w-[min(24rem,90vw)]",
             contentClassName,
           )}
         >
@@ -80,7 +84,7 @@ export function AuthorizeSpacePicker({
               <DropdownMenuItem
                 key={space.id}
                 onSelect={() => setSelectedId(space.id)}
-                className="flex items-center justify-between gap-3 py-1.5 pl-1.5 pr-2 text-[13px]"
+                className={cn(DROPDOWN_ITEM_CLASS, "justify-between")}
               >
                 <span className="flex min-w-0 items-center gap-2 text-[var(--creed-text-primary)]">
                   <ProfileAvatar

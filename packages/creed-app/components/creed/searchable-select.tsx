@@ -3,6 +3,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Check, ChevronDown, Search } from "lucide-react";
 import { Button } from "@creed/ui/button";
+import { DROPDOWN_CHEVRON_CLASS } from "@creed/ui/dropdown-menu";
 import { Input } from "@creed/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@creed/ui/popover";
 import { cn } from "@creed/ui/utils";
@@ -61,7 +62,7 @@ export function SearchableSelect({
           variant="outline"
           disabled={disabled}
           className={cn(
-            "h-11 w-full justify-between rounded-xl border-[var(--creed-border)] bg-[var(--creed-surface)] px-4 text-left text-[14px] font-normal",
+            "group h-11 w-full justify-between rounded-xl border-[var(--creed-border)] bg-[var(--creed-surface)] px-4 text-left text-[14px] font-normal",
             disabled && "cursor-not-allowed opacity-60",
             triggerClassName
           )}
@@ -69,7 +70,7 @@ export function SearchableSelect({
           <span className={cn("min-w-0 truncate", !selected && "text-[var(--creed-text-secondary)]")}>
             {selected?.label ?? placeholder}
           </span>
-          <ChevronDown className="h-4 w-4 shrink-0 text-[var(--creed-text-secondary)]" />
+          <ChevronDown className={cn(DROPDOWN_CHEVRON_CLASS, "h-4 w-4")} />
         </Button>
       </PopoverTrigger>
       <PopoverContent

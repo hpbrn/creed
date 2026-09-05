@@ -37,6 +37,9 @@ import {
   type ChartConfig,
 } from "@creed/ui/chart";
 import {
+  DROPDOWN_CHEVRON_CLASS,
+  DROPDOWN_CONTENT_CLASS,
+  DROPDOWN_ITEM_CLASS,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -483,15 +486,10 @@ export function McpHealthDashboard({ active = true }: { active?: boolean }) {
 
   return (
     <div ref={rootRef} className="mt-12 scroll-mt-8 md:scroll-mt-10">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h2 className="text-[16px] font-medium text-[var(--creed-text-primary)]">
-            Health
-          </h2>
-          <p className="mt-2 text-[14px] leading-7 text-[var(--creed-text-secondary)]">
-            How your connected agents read and improve your Creed.
-          </p>
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h2 className="text-[16px] font-medium text-[var(--creed-text-primary)]">
+          Health
+        </h2>
         {/* min-w-0 lets the agent chip shrink and ellipsize its label instead
             of pushing the other chips off-screen on narrow viewports. */}
         <div className="flex min-w-0 max-w-full items-center gap-3 md:gap-4">
@@ -888,13 +886,13 @@ export function Dropdown({
           {/* Long agent names (e.g. "Claude Code") must never wrap the chip
               onto two lines on mobile - truncate within the available width. */}
           <span className="min-w-0 truncate whitespace-nowrap">{trigger}</span>
-          <ChevronDown className="h-3.5 w-3.5 shrink-0 text-[var(--creed-text-secondary)]" />
+          <ChevronDown className={DROPDOWN_CHEVRON_CLASS} />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align={align ?? (iconSide === "right" ? "end" : "start")}
         className={cn(
-          "space-y-1 border-[var(--creed-border)] bg-[var(--creed-surface)] p-1.5",
+          DROPDOWN_CONTENT_CLASS,
           menuWidthClass,
         )}
       >
@@ -904,7 +902,7 @@ export function Dropdown({
             disabled={item.disabled}
             onSelect={() => onSelect(item.key)}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-[14px]",
+              DROPDOWN_ITEM_CLASS,
               item.disabled && "opacity-50",
             )}
           >

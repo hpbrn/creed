@@ -6,6 +6,21 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
 import { cn } from "@creed/ui/utils"
 import { CheckIcon, ChevronRightIcon } from "lucide-react"
 
+// Product menus use `--creed-surface`, not the lighter `--popover` token.
+// Open-state chevrons key off `aria-expanded` because the radix-ui
+// trigger does not expose `data-state=open` to unnamed `group-*`.
+export const DROPDOWN_CONTENT_CLASS =
+  "rounded-lg border-[var(--creed-border)] bg-[var(--creed-surface)] p-1.5"
+
+export const DROPDOWN_ITEM_CLASS =
+  "h-8 gap-2 rounded-sm px-2 py-0 text-[13px]"
+
+export const DROPDOWN_CHEVRON_CLASS =
+  "h-3.5 w-3.5 shrink-0 origin-center text-[var(--creed-text-tertiary)] transition-[color,transform,rotate] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:text-[var(--creed-text-primary)] in-aria-expanded:rotate-180 in-aria-expanded:text-[var(--creed-text-primary)]"
+
+export const DROPDOWN_SUB_CHEVRON_CLASS =
+  "h-3.5 w-3.5 shrink-0 origin-center text-[var(--creed-text-tertiary)] transition-[color,transform,rotate] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:rotate-180 group-hover:text-[var(--creed-text-primary)] group-data-open:rotate-180 group-data-open:text-[var(--creed-text-primary)] in-aria-expanded:rotate-180 in-aria-expanded:text-[var(--creed-text-primary)]"
+
 function DropdownMenu({
   modal = false,
   ...props
@@ -22,11 +37,13 @@ function DropdownMenuPortal({
 }
 
 function DropdownMenuTrigger({
+  className,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
   return (
     <DropdownMenuPrimitive.Trigger
       data-slot="dropdown-menu-trigger"
+      className={cn("group", className)}
       {...props}
     />
   )
@@ -45,7 +62,7 @@ function DropdownMenuContent({
         sideOffset={sideOffset}
         align={align}
         className={cn(
-          "z-50 max-h-(--radix-dropdown-menu-content-available-height) w-(--radix-dropdown-menu-trigger-width) min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-[var(--radius-lg)] bg-popover p-1.5 text-popover-foreground shadow-[0_12px_30px_rgba(28,28,26,0.08)] ring-1 ring-foreground/8 duration-[160ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:overflow-hidden data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
+          "z-50 max-h-(--radix-dropdown-menu-content-available-height) w-(--radix-dropdown-menu-trigger-width) min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-[var(--radius-lg)] bg-[var(--creed-surface)] p-1.5 text-popover-foreground shadow-[0_12px_30px_rgba(28,28,26,0.08)] ring-1 ring-foreground/8 duration-[160ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:overflow-hidden data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
           className
         )}
         {...props}
@@ -77,7 +94,7 @@ function DropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "group/dropdown-menu-item relative flex cursor-default items-center gap-1.5 rounded-[var(--radius-md)] px-2.5 py-2 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-inset:pl-7 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-[variant=destructive]:*:[svg]:text-destructive",
+        "group/dropdown-menu-item relative flex h-8 cursor-default items-center gap-2 rounded-sm px-2 py-0 text-[13px] outline-hidden select-none focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-inset:pl-7 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-[variant=destructive]:*:[svg]:text-destructive",
         className
       )}
       {...props}
@@ -230,13 +247,13 @@ function DropdownMenuSubTrigger({
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
       className={cn(
-        "flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-inset:pl-7 data-open:bg-accent data-open:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "group flex h-8 cursor-default items-center gap-2 rounded-sm px-2 py-0 text-[13px] outline-hidden select-none focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-inset:pl-7 data-open:bg-accent data-open:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
     >
       {children}
-      <ChevronRightIcon className="ml-auto" />
+      <ChevronRightIcon className={cn("ml-auto", DROPDOWN_SUB_CHEVRON_CLASS)} />
     </DropdownMenuPrimitive.SubTrigger>
   )
 }
@@ -249,7 +266,7 @@ function DropdownMenuSubContent({
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
       className={cn(
-        "z-50 min-w-[96px] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg bg-popover p-1.5 text-popover-foreground shadow-[0_10px_24px_rgba(28,28,26,0.08)] ring-1 ring-foreground/10 duration-[160ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
+        "z-50 min-w-[96px] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg bg-[var(--creed-surface)] p-1.5 text-popover-foreground shadow-[0_10px_24px_rgba(28,28,26,0.08)] ring-1 ring-foreground/10 duration-[160ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
         className
       )}
       {...props}

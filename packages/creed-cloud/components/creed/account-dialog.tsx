@@ -12,6 +12,9 @@ import {
   DialogTitle,
 } from "@creed/ui/dialog";
 import {
+  DROPDOWN_CHEVRON_CLASS,
+  DROPDOWN_CONTENT_CLASS,
+  DROPDOWN_ITEM_CLASS,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -424,14 +427,14 @@ export function AccountDialog({
                         </span>
                       </span>
                       <ChevronDown
-                        className="h-3.5 w-3.5 shrink-0 text-[var(--creed-text-tertiary)]"
+                        className={DROPDOWN_CHEVRON_CLASS}
                         strokeWidth={2}
                       />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="min-w-[max(var(--radix-dropdown-menu-trigger-width),12rem)] rounded-lg border-[var(--creed-border)] bg-[var(--creed-surface)] p-1"
+                    className={`${DROPDOWN_CONTENT_CLASS} min-w-[max(var(--radix-dropdown-menu-trigger-width),12rem)]`}
                   >
                     {bonusOptions.map((creed) => {
                       const selected = creed.id === bonusCreedId;
@@ -440,7 +443,7 @@ export function AccountDialog({
                           key={creed.id}
                           disabled={saving}
                           onSelect={() => setBonusCreedId(creed.id)}
-                          className="flex items-center justify-between gap-2.5 rounded-sm py-1.5 pl-1.5 pr-2.5 text-[13px]"
+                          className={`${DROPDOWN_ITEM_CLASS} justify-between`}
                         >
                           <span className="flex min-w-0 items-center gap-2 text-[var(--creed-text-primary)]">
                             <ProfileAvatar

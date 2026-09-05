@@ -3,6 +3,9 @@
 import type { ReactNode } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import {
+  DROPDOWN_CHEVRON_CLASS,
+  DROPDOWN_CONTENT_CLASS,
+  DROPDOWN_ITEM_CLASS,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -59,7 +62,7 @@ export function SelectMenu<T extends string>({
             <span className="truncate">{active?.label ?? placeholder}</span>
           </span>
           <ChevronDown
-            className="h-3.5 w-3.5 shrink-0 text-[var(--creed-text-tertiary)]"
+            className={DROPDOWN_CHEVRON_CLASS}
             strokeWidth={2}
           />
         </button>
@@ -68,7 +71,10 @@ export function SelectMenu<T extends string>({
         align={align}
         // Size to content (so short labels like "Member" never truncate), but
         // never narrower than the trigger and never wider than a sensible cap.
-        className="w-auto min-w-[max(var(--radix-dropdown-menu-trigger-width),9rem)] max-w-[min(24rem,90vw)] space-y-1 border-[var(--creed-border)] bg-[var(--creed-surface)] p-1.5"
+        className={cn(
+          DROPDOWN_CONTENT_CLASS,
+          "w-auto min-w-[max(var(--radix-dropdown-menu-trigger-width),9rem)] max-w-[min(24rem,90vw)]",
+        )}
       >
         {options.map((option) => (
           <DropdownMenuItem
@@ -77,7 +83,7 @@ export function SelectMenu<T extends string>({
               event.preventDefault();
               onChange(option.value);
             }}
-            className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-[13px]"
+            className={cn(DROPDOWN_ITEM_CLASS, "justify-between")}
           >
             <span className="flex min-w-0 items-center gap-2 text-[var(--creed-text-primary)]">
               {option.avatar}
