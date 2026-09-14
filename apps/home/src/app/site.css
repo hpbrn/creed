@@ -1,0 +1,93 @@
+:root {
+  --font-geist-sans:
+    "Geist Variable", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-geist-mono: "Geist Mono Variable", monospace;
+}
+body {
+  margin: 0;
+  background: var(--creed-background);
+  color: var(--creed-text-primary);
+  font-family: var(--font-geist-sans);
+}
+
+.roadmap-description {
+  overflow-wrap: anywhere;
+}
+.roadmap-description > * + * {
+  margin-top: 12px;
+}
+.roadmap-description ul,
+.roadmap-description ol {
+  padding-left: 1.5em;
+}
+.roadmap-description ul {
+  list-style: disc;
+}
+.roadmap-description ol {
+  list-style: decimal;
+}
+.roadmap-description li + li {
+  margin-top: 4px;
+}
+.roadmap-description li > ul,
+.roadmap-description li > ol {
+  margin-top: 4px;
+}
+.roadmap-description :is(h2, h3, h4, strong) {
+  font-weight: 600;
+  color: var(--creed-text-primary);
+}
+.roadmap-description a {
+  color: var(--creed-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.roadmap-description blockquote {
+  border-left: 2px solid var(--creed-border);
+  padding-left: 12px;
+}
+.roadmap-description pre {
+  overflow-x: auto;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: var(--creed-surface-raised);
+}
+.roadmap-description code {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.9em;
+}
+.roadmap-description table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+.roadmap-description :is(th, td) {
+  border: 1px solid var(--creed-border);
+  padding: 6px 10px;
+}
+.roadmap-description li[data-type="taskItem"] {
+  list-style: "☐ ";
+}
+.roadmap-description li[data-checked="true"] {
+  list-style: "☑ ";
+}
+
+.scroll-ascii-row {
+  animation: scroll-dither 5s ease-in-out infinite alternate;
+}
+
+@keyframes scroll-dither {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-ascii-row {
+    animation: none;
+  }
+}

@@ -1,0 +1,4 @@
+/public/downloads/*.dmg
+.vercel
+.env*
+!.env.example

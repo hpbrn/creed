@@ -1,0 +1,98 @@
+[data-slot="dropdown-menu-content"],
+[data-slot="dropdown-menu-sub-content"],
+[data-slot="popover-content"],
+[data-slot="tooltip-content"] {
+  --creed-popup-duration: 160ms;
+}
+[data-slot="tooltip-content"] {
+  transform-origin: var(--radix-tooltip-content-transform-origin);
+}
+[data-slot="tooltip-content"]:is(
+  [data-state="delayed-open"],
+  [data-state="instant-open"]
+) {
+  animation: creed-popup-enter var(--creed-popup-duration)
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+[data-slot="tooltip-content"][data-state="closed"] {
+  animation: creed-popup-exit var(--creed-popup-duration)
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+  pointer-events: none;
+}
+[data-slot="dialog-content"] {
+  --creed-popup-duration: 200ms;
+}
+:is(
+  [data-slot="dropdown-menu-content"],
+  [data-slot="dropdown-menu-sub-content"],
+  [data-slot="popover-content"],
+  [data-slot="dialog-content"]
+)[data-state="open"] {
+  animation: creed-popup-enter var(--creed-popup-duration)
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+:is(
+  [data-slot="dropdown-menu-content"],
+  [data-slot="dropdown-menu-sub-content"],
+  [data-slot="popover-content"],
+  [data-slot="dialog-content"]
+)[data-state="closed"] {
+  animation: creed-popup-exit var(--creed-popup-duration)
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+  pointer-events: none;
+}
+[data-slot="dialog-overlay"][data-state="open"] {
+  animation: creed-overlay-enter 200ms ease-out both;
+}
+[data-slot="dialog-overlay"][data-state="closed"] {
+  animation: creed-overlay-exit 200ms ease-in both;
+  pointer-events: none;
+}
+@keyframes creed-popup-enter {
+  from {
+    opacity: 0;
+    transform: translateY(3px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes creed-popup-exit {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(3px) scale(0.98);
+  }
+}
+@keyframes creed-overlay-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes creed-overlay-exit {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(
+    [data-slot="dropdown-menu-content"],
+    [data-slot="dropdown-menu-sub-content"],
+    [data-slot="popover-content"],
+    [data-slot="dialog-content"],
+    [data-slot="dialog-overlay"],
+    [data-slot="tooltip-content"]
+  )[data-state] {
+    animation-duration: 1ms;
+  }
+}

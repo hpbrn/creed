@@ -1,0 +1,166 @@
+:root {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --font-geist-sans:
+    "Geist Variable", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-geist-mono: "Geist Mono Variable", monospace;
+  --creed-native-titlebar-height: 38px;
+}
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.creed-scrollbar,
+[data-slot="scroll-area-viewport"] {
+  overscroll-behavior: none;
+}
+
+.creed-desktop-root {
+  height: 100%;
+  padding-top: 0;
+}
+
+.creed-desktop-root[data-fullscreen="true"] {
+  padding-top: 0;
+}
+
+.creed-window-toolbar {
+  position: relative;
+  padding-left: 98px;
+  background: var(--creed-surface);
+}
+
+.creed-traffic-lights-card {
+  pointer-events: none;
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 78px;
+  height: 32px;
+  border: 1px solid var(--creed-border);
+  border-radius: 13px;
+  background: var(--creed-surface);
+}
+
+.creed-desktop-root[data-fullscreen="true"] .creed-traffic-lights-card {
+  display: none;
+}
+
+.creed-desktop-root[data-fullscreen="true"] .creed-window-toolbar {
+  padding-left: 8px;
+}
+
+.creed-responsive-toolbar .creed-toolbar-actions {
+  position: relative;
+}
+
+@media (width < 1024px) {
+  .creed-sidebar-controls {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.creed-responsive-toolbar .creed-toolbar-actions > button {
+  transition-property:
+    color, background-color, border-color, box-shadow, transform, translate, scale, filter, opacity;
+}
+
+.creed-responsive-toolbar .creed-toolbar-actions .md\:hidden,
+.creed-responsive-toolbar .creed-toolbar-actions .md\:inline-flex {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: max-content;
+}
+
+.creed-responsive-toolbar .creed-toolbar-actions .md\:inline-flex {
+  font-size: 14px;
+  padding-inline: 14px;
+}
+
+.creed-responsive-toolbar:not([data-compact-actions="true"])
+  .creed-toolbar-actions
+  .md\:hidden,
+.creed-responsive-toolbar[data-compact-actions="true"]
+  .creed-toolbar-actions
+  .md\:inline-flex {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  width: max-content;
+  top: 0;
+  left: 0;
+}
+
+.creed-toolbar-sync-label {
+  width: var(--sync-label-width, max-content);
+  overflow: hidden;
+  white-space: nowrap;
+  opacity: 1;
+  transition:
+    width 160ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.creed-toolbar-sync {
+  transition: gap 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.creed-responsive-toolbar[data-compact-sync="true"] .creed-toolbar-sync-label {
+  width: 0;
+  opacity: 0;
+}
+
+.creed-responsive-toolbar[data-compact-sync="true"] .creed-toolbar-sync {
+  gap: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .creed-toolbar-sync,
+  .creed-toolbar-sync-label {
+    transition: none;
+  }
+}
+
+.creed-window-main [data-persistent-app-surface="settings"],
+.creed-window-main [data-persistent-app-surface="connections"] {
+  overflow: hidden;
+  border: 1px solid var(--creed-border);
+  border-radius: 16px;
+}
+
+.creed-native-titlebar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 100;
+  height: var(--creed-native-titlebar-height);
+  background: var(--creed-surface);
+  user-select: none;
+}
+
+.creed-desktop-root .h-dvh {
+  height: 100dvh;
+}
+
+.creed-desktop-root[data-fullscreen="true"] .h-dvh {
+  height: 100dvh;
+}
+
+@keyframes creed-home-wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(12deg);
+  }
+}

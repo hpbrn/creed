@@ -1,0 +1,57 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Creed",
+  "version": "1.0.0",
+  "identifier": "md.creed.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev -- --host 127.0.0.1 --port 1420 --strictPort",
+    "devUrl": "http://127.0.0.1:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Creed",
+        "width": 1200,
+        "height": 800,
+        "visible": false,
+        "decorations": true,
+        "resizable": true,
+        "minWidth": 720,
+        "minHeight": 480,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "trafficLightPosition": {
+          "x": 17,
+          "y": 26
+        }
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; connect-src ipc: http://ipc.localhost; style-src 'self' 'unsafe-inline'; img-src 'self' asset: http://asset.localhost data: blob:"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg"],
+    "icon": ["icons/icon.icns", "icons/icon.png"],
+    "macOS": {
+      "dmg": {
+        "windowPosition": { "x": 420, "y": 260 },
+        "windowSize": {
+          "width": 600,
+          "height": 320
+        },
+        "appPosition": {
+          "x": 160,
+          "y": 125
+        },
+        "applicationFolderPosition": {
+          "x": 440,
+          "y": 125
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "creed",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run desktop --workspace creed-desktop",
+    "dev:home": "npm run dev --workspace creed-home",
+    "build": "npm run build --workspaces",
+    "bundle": "npm run bundle --workspace creed-desktop",
+    "typecheck": "npm run typecheck --workspaces",
+    "lint": "eslint apps",
+    "test": "npm run test --workspace creed-desktop && npm run test:native --workspace creed-desktop && npm run test --workspace creed-home"
+  },
+  "devDependencies": {
+    "eslint": "^9",
+    "eslint-config-next": "16.3.0",
+    "prettier": "^3"
+  },
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=22.12"
+  }
+}

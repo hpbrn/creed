@@ -1,0 +1,108 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing or new release tag to publish
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+    env:
+      APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+      APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      CREED_UPDATER_PUBLIC_KEY: ${{ secrets.CREED_UPDATER_PUBLIC_KEY }}
+      CREED_UPDATER_URL: https://github.com/hpbrn/creed/releases/latest/download/latest.json
+      CREED_RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Verify release prerequisites
+        run: |
+          for name in TAURI_SIGNING_PRIVATE_KEY CREED_UPDATER_PUBLIC_KEY; do
+            if [ -z "${!name}" ]; then
+              echo "Missing required release secret: $name" >&2
+              exit 1
+            fi
+          done
+          apple_secrets=(APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID KEYCHAIN_PASSWORD)
+          configured=0
+          for name in "${apple_secrets[@]}"; do
+            if [ -n "${!name}" ]; then configured=$((configured + 1)); fi
+          done
+          if [ "$configured" -ne 0 ] && [ "$configured" -ne "${#apple_secrets[@]}" ]; then
+            echo "Configure every Apple signing secret or none of them." >&2
+            exit 1
+          fi
+          version="$(node -p "require('./apps/desktop/package.json').version")"
+          test "$CREED_RELEASE_TAG" = "v$version"
+      - name: Install release dependencies
+        run: npm ci
+      - name: Verify release source
+        run: |
+          npm run typecheck
+          npm run lint
+          npm test
+      - name: Import Developer ID certificate
+        if: ${{ env.APPLE_CERTIFICATE != '' }}
+        run: |
+          node -e 'require("node:fs").writeFileSync("certificate.p12", Buffer.from(process.env.APPLE_CERTIFICATE, "base64"))'
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+          identity="$(security find-identity -v -p codesigning build.keychain | awk -F '"' '/Developer ID Application/ { print $2; exit }')"
+          test -n "$identity"
+          echo "APPLE_SIGNING_IDENTITY=$identity" >> "$GITHUB_ENV"
+          rm certificate.p12
+      - name: Configure ad-hoc signing
+        if: ${{ env.APPLE_CERTIFICATE == '' }}
+        run: echo "APPLE_SIGNING_IDENTITY=-" >> "$GITHUB_ENV"
+      - name: Build and sign Creed
+        working-directory: apps/desktop
+        run: |
+          if [ -z "$APPLE_CERTIFICATE" ]; then
+            unset APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID KEYCHAIN_PASSWORD
+          fi
+          npm run bundle
+      - name: Create updater manifest
+        working-directory: apps/desktop
+        run: node scripts/write-updater-manifest.mjs
+      - name: Publish release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          assets=(
+            apps/desktop/src-tauri/target/release/bundle/dmg/*.dmg
+            apps/desktop/src-tauri/target/release/bundle/macos/*.app.tar.gz
+            apps/desktop/src-tauri/target/release/bundle/macos/*.app.tar.gz.sig
+            apps/desktop/src-tauri/target/release/bundle/macos/latest.json
+          )
+          if gh release view "$CREED_RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$CREED_RELEASE_TAG" "${assets[@]}" --clobber
+          else
+            gh release create "$CREED_RELEASE_TAG" "${assets[@]}" --title "Creed ${CREED_RELEASE_TAG#v}" --generate-notes
+          fi
